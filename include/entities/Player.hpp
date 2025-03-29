@@ -1,10 +1,12 @@
 #pragma once
 
 #include "Character.hpp"
+#include "../tools/ResourceManager_T.hpp"
 
 class Player : public Character {
-public:
-    Player(sf::Vector2f p, sf::Sprite& s, int h, float spd);
+private:
+    sf::Sprite createSprite(ResourceManager<sf::Texture>& textureManager);
 
-    virtual void update(float dt) override;
+public:
+    Player(ResourceManager<sf::Texture>& textureManager);
 };

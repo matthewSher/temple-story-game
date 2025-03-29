@@ -39,11 +39,12 @@ void Game::run() {
             if (event->is<sf::Event::KeyPressed>()) {
                 float moveSpeed = 12.f;
 
-                // Управление персонажем
-                gameProcessState->handleInput(event);
-
                 // Перемещение камеры с помощью стрелок
                 const auto* keyEvent = event->getIf<sf::Event::KeyPressed>();
+
+                // Управление персонажем
+                gameProcessState->handleInput(keyEvent);
+
                 switch (keyEvent->code) {
                 case sf::Keyboard::Key::Left:
                     view.move({-moveSpeed, 0});
@@ -67,7 +68,7 @@ void Game::run() {
 
         window.clear();
         window.draw(tileMap);
-        // gameProcessState->render(window);
+        gameProcessState->render(window);
         window.display();
     }
 }

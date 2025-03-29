@@ -15,7 +15,6 @@ public:
     Character(sf::Vector2f p, sf::Sprite s, int h, float spd);
     virtual ~Character() = default;
 
-    virtual void update(float dt) = 0;
     void move(sf::Vector2f dir);
     void takeDamage(int amount);
     void heal(int amount);

@@ -6,14 +6,12 @@
 
 class GameProcessState : public GameState {
 private:
-    Player player;
+    std::unique_ptr<Player> player;
     ResourceManager<sf::Texture>& textureManager;
-
-    Player createPlayer();
 
 public:
     GameProcessState(ResourceManager<sf::Texture>& textureManager);
 
-    void handleInput(const std::optional<sf::Event>& event) override;
+    void handleInput(const sf::Event::KeyPressed *keyEvent) override;
     void render(sf::RenderWindow& window) override;
 };
