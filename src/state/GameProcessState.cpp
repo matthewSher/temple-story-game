@@ -7,8 +7,6 @@ GameProcessState::GameProcessState(ResourceManager<sf::Texture, TextureKeys>& te
 }
 
 void GameProcessState::handleInput(const sf::Event::KeyPressed *keyEvent) {
-    // const auto* keyEvent = event->getIf<sf::Event::KeyPressed>();
-    
     switch (keyEvent->code) {
     case sf::Keyboard::Key::A:
         player->move({-1, 0});
