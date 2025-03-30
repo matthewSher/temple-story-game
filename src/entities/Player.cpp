@@ -1,11 +1,11 @@
 #include "../../include/entities/Player.hpp"
 
-Player::Player(ResourceManager<sf::Texture>& textureManager) 
+Player::Player(ResourceManager<sf::Texture, TextureKeys>& textureManager) 
     : Character(sf::Vector2f(48.f, 48.f), createSprite(textureManager), 100, 12.f) {}
 
-sf::Sprite Player::createSprite(ResourceManager<sf::Texture>& textureManager) {
+sf::Sprite Player::createSprite(ResourceManager<sf::Texture, TextureKeys>& textureManager) {
     infoLog("Player::createSprite", "Вызван метод");
-    const auto& tilesetTexture = textureManager.get("tileset");
+    const auto& tilesetTexture = textureManager.get(TextureKeys::Tileset);
 
     // Параметры тайлсета
     const int tileSize = 12; // Размер тайла (12x12 пикселей)
@@ -25,7 +25,7 @@ sf::Sprite Player::createSprite(ResourceManager<sf::Texture>& textureManager) {
 
     // Загрузка текстуры для персонажа
     sf::IntRect rect({tileX, tileY}, {tileSize, tileSize});
-    const sf::Texture& playerTexture = textureManager.getSubTexture("tileset", "player", rect);
+    const sf::Texture& playerTexture = textureManager.getSubTexture(TextureKeys::Tileset, TextureKeys::Player, rect);
     
     return sf::Sprite(playerTexture);
 }

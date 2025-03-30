@@ -10,7 +10,7 @@ Game::Game() {
     window = sf::RenderWindow(sf::VideoMode({1280, 720}), "Game");
 
     // Загрузка тайлсета в буфер с ресурсами
-    if (!textureManager.load("tileset", "assets/img/tileset.png")) {
+    if (!textureManager.load(TextureKeys::Tileset, "assets/img/tileset.png")) {
         errorLog("Game::Game", "Ошибка загрузки тайлсета");
         return;
     }
@@ -21,10 +21,10 @@ Game::Game() {
 void Game::run() {
     sf::View view = window.getView();
     view.setSize(sf::Vector2f(window.getSize()) / 3.f);
-    view.setCenter(sf::Vector2f(window.getSize()) / 2.f);
+    // view.setCenter(sf::Vector2f(window.getSize()) / 2.f);
     window.setView(view);
 
-    TileMap tileMap(textureManager.get("tileset"));
+    TileMap tileMap(textureManager.get(TextureKeys::Tileset));
     if (!tileMap.load("assets/locations/1_part_map.tmx")) {
         errorLog("Game::run", "Ошибка загрузки тайлсета");
         return;

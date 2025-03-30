@@ -9,19 +9,21 @@
  * Этот класс является шаблонным, поэтому его реализация находится в заголовочном файле.
  * Класс предназначен для загрузки ресурсов из файловой системы.
  * 
- * Обёрнут шаблоном Resource, который может быть одним из трёх SFML классов:
- * sf::Texture, sf::Font, sf::SoundBuffer.
+ * Обёрнут шаблонами Resource и Identifier. Первый может быть одним из трёх SFML классов:
+ * sf::Texture, sf::Font, sf::SoundBuffer. Второй определяет enum class с идентификаторами
+ * ресурсов: TextureKeys, FontKeys или SoundKeys.
  */
 
-template <typename Resource>
+template <typename Resource, typename Identifier>
 class ResourceManager {
 private:
-    std::map<std::string, Resource> resources;  // В этот словарь помещаются все загруженные ресурсы
+    // В этот словарь помещаются все загруженные ресурсы
+    std::map<Identifier, Resource> resources;
 
 public:
     // Метод для загрузки ресурсов. Принимает в качестве аргументов
     // название ресурса (name) и путь к нему (path)
-    bool load(const std::string& name, const std::string& path) {
+    bool load(Identifier name, const std::string& path) {
         if (resources.find(name) != resources.end()) {
             errorLog("ResourceManager::load", "Ресурс уже загружен");
             return false;
@@ -36,25 +38,25 @@ public:
         // Помещаем ресурс в map
         resources[name] = std::move(resource);
 
-        infoLog("ResourceManager::load", "Ресурс " + name + " успешно загружен");
+        infoLog("ResourceManager::load", "Ресурс успешно загружен");
         return true;
     }
 
     // Метод, по которому можно получить соответствующий ресурс.
     // В качестве параметра передаётся название ресурса (name)
-    Resource& get(const std::string& name) {
+    Resource& get(Identifier name) {
         auto it = resources.find(name); // Ищет ресурс по имени внутри map
     
         // Если ресурс не найден
         if (it == resources.end()) {
             errorLog("ResourceManager::get", "Ресурс не найден");
-            throw std::runtime_error("Resources not found: " + name);
+            throw std::runtime_error("Resources not found");
         }
     
-        // Если ресурс найден, it указывает на пару ключ-значение std::pair<std::string, Resource>.
+        // Если ресурс найден, it указывает на пару ключ-значение std::pair<Identifier, Resource>.
         // Возвращаем сам ресурс, т.е. второе значение
 
-        infoLog("ResourceManager::get", "Ресурс " + name + " успешно получен");
+        infoLog("ResourceManager::get", "Ресурс успешно получен");
         return it->second;
     }
 
@@ -63,9 +65,7 @@ public:
     // Полезно, когда из тайлсета нужно вырезать один конкретный тайл
     template <typename T = Resource>
     std::enable_if_t<std::is_same_v<T, sf::Texture>, sf::Texture&>
-    getSubTexture(const std::string& sourceTextureName, const std::string& name, const sf::IntRect& rect) {
-        infoLog("ResourceManager::getSubTexture", "Вызван метод");
-
+    getSubTexture(Identifier sourceTextureName, Identifier name, const sf::IntRect& rect) {
         auto it = resources.find(name);
         if (it != resources.end()) return it->second;
 
@@ -73,12 +73,12 @@ public:
 
         sf::Texture subTexture;
         if (!subTexture.loadFromImage(sourceTexture.copyToImage(), false, rect)) {
-            errorLog("ResourceManager::getSubTexture", "Ошибка загрузки подтекстуры: " + name);
-            throw std::runtime_error("Failed to load subtexture: " + name);
+            errorLog("ResourceManager::getSubTexture", "Ошибка загрузки подтекстуры");
+            throw std::runtime_error("Failed to load subtexture");
         }
         resources[name] = std::move(subTexture);
 
-        infoLog("ResourceManager::getSubTexture", "Подтекстура " + name + " получена");
+        infoLog("ResourceManager::getSubTexture", "Подтекстура получена");
         return resources[name];
     }
 };

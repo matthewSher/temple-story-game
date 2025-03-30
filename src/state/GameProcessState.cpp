@@ -1,6 +1,6 @@
 #include "../../include/state/GameProcessState.hpp"
 
-GameProcessState::GameProcessState(ResourceManager<sf::Texture>& textureManager)
+GameProcessState::GameProcessState(ResourceManager<sf::Texture, TextureKeys>& textureManager)
     : textureManager(textureManager) {
     infoLog("GameProcessState::GameProcessState", "Вызван конструктор");
     player = std::make_unique<Player>(textureManager);
