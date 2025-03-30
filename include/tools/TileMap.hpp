@@ -1,11 +1,9 @@
 #pragma once
 
 #include <vector>
-#include <memory>
 #include <SFML/Graphics.hpp>
 #include <tmxlite/Map.hpp>
 #include <tmxlite/TileLayer.hpp>
-#include <tmxlite/Tileset.hpp>
 
 /**
  * Класс TileMap предназначен для отрисовки карты тайлов. Он наследуется

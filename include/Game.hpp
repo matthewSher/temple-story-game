@@ -3,17 +3,12 @@
 #include <memory>
 #include <SFML/Graphics.hpp>
 #include "constants/TextureKeys.hpp"
-#include "state/GameState.hpp"
-#include "tools/ResourceManager_T.hpp"
-#include "../include/entities/Player.hpp"
 #include "../include/state/GameProcessState.hpp"
 
 /**
  * Основной класс. Требуется для запуска игры, создания окна и
  * его настройки.
  */
-
-class GameProcessState;
 
 class Game {
 private:
