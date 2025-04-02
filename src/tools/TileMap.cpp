@@ -72,7 +72,7 @@ void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     states.texture = &tilesetTexture;
 
     for (const auto& layer : layersVertexArray) {
-        target.draw(*layer, states);
+        target.draw(*(layer.second), states);
     }
 }
 
@@ -94,7 +94,9 @@ bool TileMap::load(const std::string& tmxFile) {
         const auto& tileLayer = layer->getLayerAs<tmx::TileLayer>();
 
         auto vertexArray = createVertexArrayForLayer(tileLayer, mapSize, tileSize);
-        layersVertexArray.push_back(std::move(vertexArray));
+        
+        // Добавление слоя вершин vertexArray с ключом tileLayer.getName() в layersVertexArray
+        layersVertexArray[tileLayer.getName()] = std::move(vertexArray);
     }
 
     return true;

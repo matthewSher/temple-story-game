@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <map>
 #include <SFML/Graphics.hpp>
 #include <tmxlite/Map.hpp>
 #include <tmxlite/TileLayer.hpp>
@@ -17,8 +17,9 @@
 
 class TileMap : public sf::Drawable {
 private:
-    const sf::Texture& tilesetTexture;                               // Хранит текстуру для тайлсета
-    std::vector<std::unique_ptr<sf::VertexArray>> layersVertexArray; // Массив слоёв карты тайлов
+    const sf::Texture& tilesetTexture;
+    // Словарь слоёв карты тайлов
+    std::map<std::string, std::unique_ptr<sf::VertexArray>> layersVertexArray;
     
     // Возвращает массив вершин для слоя tileLayer тайл карты. Во избежание
     // копирования массива вершин, он обёрнут в умный указатель
