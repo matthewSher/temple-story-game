@@ -12,7 +12,7 @@ Game::Game() {
     // Загрузка тайлсета в буфер с ресурсами
     if (!textureManager.load(TextureKeys::Tileset, "assets/img/tileset.png")) {
         errorLog("Game::Game", "Ошибка загрузки тайлсета");
-        return;
+        throw std::runtime_error("Error loading tileset");
     }
 
     gameProcessState = std::make_unique<GameProcessState>(textureManager);
@@ -23,12 +23,6 @@ void Game::run() {
     view.setSize(sf::Vector2f(window.getSize()) / 3.f);
     // view.setCenter(sf::Vector2f(window.getSize()) / 2.f);
     window.setView(view);
-
-    TileMap tileMap(textureManager.get(TextureKeys::Tileset));
-    if (!tileMap.load("assets/locations/1_part_map.tmx")) {
-        errorLog("Game::run", "Ошибка загрузки тайлсета");
-        return;
-    }
 
     while (window.isOpen()) {
         while (const std::optional event = window.pollEvent()) {
@@ -67,7 +61,6 @@ void Game::run() {
         }    
 
         window.clear();
-        window.draw(tileMap);
         gameProcessState->render(window);
         window.display();
     }
