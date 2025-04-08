@@ -20,4 +20,5 @@ public:
     void heal(int amount);
     bool isDead() const;
     float getSpeed() const;
+    sf::Vector2f getPosition() const override;
 };

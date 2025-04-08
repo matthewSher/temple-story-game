@@ -17,6 +17,9 @@
 
 class TileMap : public sf::Drawable {
 private:
+    // Размер тайла в пикселях (ширина и высота)
+    const tmx::Vector2u tileSize;
+    // Тайлсет карты тайлов (текстура с набором тайлов)
     const sf::Texture& tilesetTexture;
     // Словарь слоёв карты тайлов
     std::map<std::string, std::unique_ptr<sf::VertexArray>> layersVertexArray;
@@ -38,8 +41,10 @@ protected:
 
 public:
     // Конструктор, принимающий текстуру тайлсета
-    TileMap(const sf::Texture& texture);
+    TileMap(const sf::Texture& texture, const tmx::Vector2u& tileSize);
 
     // Подготовка карты тайлов перед рендером на экране
     bool load(const std::string& tmxFile);
+    // Проверка, является ли тайл коллизионным (т.е. можно ли по нему пройти)
+    bool isTileCollidable(const sf::Vector2f tilePosition) const;
 };

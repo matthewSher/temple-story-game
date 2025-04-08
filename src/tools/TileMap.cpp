@@ -1,9 +1,11 @@
 #include "../../include/tools/TileMap.hpp"
 #include "../../include/utils/logging.h"
+#include "../../include/constants/main_constants.h"
 
 #include <iostream>
 
-TileMap::TileMap(const sf::Texture& texture) : tilesetTexture(texture) {}
+TileMap::TileMap(const sf::Texture& texture, const tmx::Vector2u& tileSize) 
+    : tilesetTexture(texture), tileSize(tileSize) {}
 
 std::unique_ptr<sf::VertexArray> TileMap::createVertexArrayForLayer(const tmx::TileLayer& tileLayer, 
     const tmx::Vector2u& mapSize, const tmx::Vector2u& tileSize) {
@@ -14,9 +16,7 @@ std::unique_ptr<sf::VertexArray> TileMap::createVertexArrayForLayer(const tmx::T
     vertexArray->setPrimitiveType(sf::PrimitiveType::Triangles);
     
     // Устанавливаем размер массива по формуле:
-    // количество_тайлов * 6,
-    // где 6 - общее кол-во вершин двух треугольников (по 3 на каждый)
-    vertexArray->resize(mapSize.x * mapSize.y * 6);
+    vertexArray->resize(mapSize.x * mapSize.y * VERTECES_IN_TILE);
     
     // Потайловый перебор текстуры тайлсета (где x, y - координаты тайла в тайлах, не в пикселях!)
     for (int y = 0; y < mapSize.y; y++) {
@@ -43,7 +43,7 @@ void TileMap::fillVertexArrayWithTile(sf::VertexArray& vertexArray, int x, int y
     int tv = tileID / (tilesetTexture.getSize().x / (tileSize.x + of));
 
     // Указатель на текущий тайл в VertexArray
-    sf::Vertex* triangles = &(vertexArray)[(x + y * mapSize.x) * 6];
+    sf::Vertex* triangles = &(vertexArray)[(x + y * mapSize.x) * VERTECES_IN_TILE];
 
     // Задание позиции вершин для двух треугольников (для отображения в игре)
     // Треугольник (0, 1, 2)
@@ -100,4 +100,32 @@ bool TileMap::load(const std::string& tmxFile) {
     }
 
     return true;
+}
+
+bool TileMap::isTileCollidable(const sf::Vector2f tilePosition) const {
+    // Проверяем, есть ли слой коллизий в layersVertexArray
+    auto it = layersVertexArray.find("collision");
+    if (it == layersVertexArray.end()) {
+        errorLog("TileMap::isTileCollidable", "Слой коллизий не найден");
+        return false;
+    }
+
+    const auto& vertexArray = it->second;
+    if (!vertexArray) {
+        errorLog("TileMap::isTileCollidable", "Массив вершин для слоя коллизий пуст");
+        return false;
+    }
+
+    // Проверяем, находится ли tilePosition внутри одного из тайлов слоя "collision"
+    for (int i = 0; i < vertexArray->getVertexCount(); i += VERTECES_IN_TILE) { 
+        // Получаем верхний левый угол тайла (первую вершину)
+        const sf::Vertex& v0 = (*vertexArray)[i];
+
+        // Проверяем, совпадает ли позиция тайла с позицией тайла, который мы проверяем на коллизию
+        if (tilePosition.x == v0.position.x && tilePosition.y == v0.position.y) {
+            return true;
+        }
+    }
+
+    return false;
 }

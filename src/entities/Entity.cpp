@@ -7,3 +7,7 @@ Entity::Entity(sf::Vector2f p, sf::Sprite s) : position(p), sprite(s) {
 void Entity::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     target.draw(sprite, states);
 }
+
+sf::Vector2f Entity::getPosition() const {
+    return position;
+}

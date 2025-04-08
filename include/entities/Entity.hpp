@@ -12,5 +12,7 @@ protected:
 public:
     Entity(sf::Vector2f p, sf::Sprite s);
     virtual ~Entity() = default;
+
+    virtual sf::Vector2f getPosition() const;
 };
 

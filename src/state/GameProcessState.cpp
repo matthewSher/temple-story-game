@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <string>
+#include <iostream>
 
 namespace fs = std::filesystem;
 
@@ -41,20 +42,29 @@ void GameProcessState::setCurrentRoomIndex(int newIndex) {
 void GameProcessState::handleInput(const sf::Event::KeyPressed *keyEvent) {
     switch (keyEvent->code) {
     case sf::Keyboard::Key::A:
-        player->move({-1, 0});
+        if (!rooms[currentRoomIndex]->checkCollision(player->getPosition() + sf::Vector2f(-1, 0))) {
+            player->move({-1, 0});
+        }
         break;
     case sf::Keyboard::Key::D:
-        player->move({1, 0});
+        if (!rooms[currentRoomIndex]->checkCollision(player->getPosition() + sf::Vector2f(1, 0))) {
+            player->move({1, 0});
+        }
         break;
     case sf::Keyboard::Key::W:
-        player->move({0, -1});
+        if (!rooms[currentRoomIndex]->checkCollision(player->getPosition() + sf::Vector2f(0, -1))) {
+            player->move({0, -1});
+        }
         break;
     case sf::Keyboard::Key::S:
-        player->move({0, 1});
+        if (!rooms[currentRoomIndex]->checkCollision(player->getPosition() + sf::Vector2f(0, 1))) {
+            player->move({0, 1});
+        }
         break;
     default:
         break;
     }
+    std::cout << "Player position: " << player->getPosition().x << ", " << player->getPosition().y << std::endl;
 }
 
 void GameProcessState::render(sf::RenderWindow& window) {

@@ -1,5 +1,7 @@
 #include "../../include/entities/Character.hpp"
 
+#include "../../include/constants/main_constants.h"
+
 Character::Character(sf::Vector2f p, sf::Sprite s, int h, float spd)
     : Entity(p, s), currentHealth(h), maxHealth(h), speed(spd), isMoving(false) {}
 
@@ -26,4 +28,8 @@ bool Character::isDead() const {
 
 float Character::getSpeed() const {
     return speed;
+}
+
+sf::Vector2f Character::getPosition() const {
+    return {position.x / TILE_SIZE, position.y / TILE_SIZE};
 }

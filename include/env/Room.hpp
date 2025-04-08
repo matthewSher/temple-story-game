@@ -12,5 +12,6 @@ private:
 public:
     Room(ResourceManager<sf::Texture, TextureKeys>& textureManager, const std::string& tilemapPath);
 
+    bool checkCollision(const sf::Vector2f& position) const;
     void render(sf::RenderWindow& window);
 };
