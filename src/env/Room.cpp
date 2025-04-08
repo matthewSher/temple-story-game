@@ -17,6 +17,8 @@ Room::Room(ResourceManager<sf::Texture, TextureKeys>& textureManager, const std:
 }
 
 bool Room::checkCollision(const sf::Vector2f& position) const {
+    // Позиция передается в тайлах, поэтому умножаем на TILE_SIZE 
+    // для получения позиции в пикселях, поскольку isTileCollidable ожидает позицию в пикселях
     sf::Vector2f playerPixelPos = {position.x * TILE_SIZE, position.y * TILE_SIZE};
     return roomTilemap->isTileCollidable(playerPixelPos);
 }

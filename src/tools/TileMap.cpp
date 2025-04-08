@@ -56,7 +56,8 @@ void TileMap::fillVertexArrayWithTile(sf::VertexArray& vertexArray, int x, int y
     triangles[4].position = sf::Vector2f(x * tileSize.x, (y + 1) * tileSize.y);
     triangles[5].position = sf::Vector2f(triangles[0].position);
 
-    // "Вырезаем" нужный тайл из текстуры тайлсета
+    // Задание текстурных координат для двух треугольников (для отображения в игре)
+    // Текстурные координаты определяют, какая часть текстуры будет отображаться на тайле
     // Треугольник (0, 1, 2)
     triangles[0].texCoords = sf::Vector2f(tu * (tileSize.x + of) + of, tv * (tileSize.y + of) + of);
     triangles[1].texCoords = sf::Vector2f((tu + 1) * (tileSize.x + of), tv * (tileSize.y + of) + of);
@@ -71,6 +72,7 @@ void TileMap::fillVertexArrayWithTile(sf::VertexArray& vertexArray, int x, int y
 void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     states.texture = &tilesetTexture;
 
+    // Отрисовка всех слоёв карты
     for (const auto& layer : layersVertexArray) {
         target.draw(*(layer.second), states);
     }

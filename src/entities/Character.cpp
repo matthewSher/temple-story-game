@@ -3,12 +3,10 @@
 #include "../../include/constants/main_constants.h"
 
 Character::Character(sf::Vector2f p, sf::Sprite s, int h, float spd)
-    : Entity(p, s), currentHealth(h), maxHealth(h), speed(spd), isMoving(false) {}
+    : Entity(p, s), currentHealth(h), maxHealth(h), speed(spd) {}
 
 void Character::move(sf::Vector2f dir) {
-    direction = dir;
-    isMoving = true;
-    position += direction * speed;
+    position += dir * speed;
     sprite.setPosition(position);
 }
 
