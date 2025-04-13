@@ -4,6 +4,8 @@
 #include <string>
 #include <iostream>
 
+#include "../../include/constants/path.h"
+
 namespace fs = std::filesystem;
 
 GameProcessState::GameProcessState(ResourceManager<sf::Texture, TextureKeys>& textureManager)
@@ -14,16 +16,30 @@ GameProcessState::GameProcessState(ResourceManager<sf::Texture, TextureKeys>& te
 }
 
 void GameProcessState::loadRooms() {
-    std::string locationsFolder = "./assets/locations/";
+    std::string levelsFolder = LEVEL_PATH;
     std::string targetExt = ".tmx";
 
     try {
-        for (const auto& folderItem : fs::directory_iterator(locationsFolder)) {
-            if (!folderItem.is_regular_file()) continue;
+        // Перебор всех папок в levelsFolder
+        for (const auto& levelFolder : fs::directory_iterator(levelsFolder)) {
+            if (!levelFolder.is_directory()) continue;
 
-            std::string fileExt = folderItem.path().extension().string();
-            if (fileExt == targetExt) {
-                rooms.push_back(std::make_unique<Room>(textureManager, folderItem.path().string()));
+            // Перебор всех папок в levelFolder
+            for (const auto& roomFolder : fs::directory_iterator(levelFolder)) {
+                if (!roomFolder.is_directory()) continue;
+
+                // Перебор всех файлов в roomFolder
+                for (const auto& file : fs::directory_iterator(roomFolder)) {
+                    if (!file.is_regular_file()) continue;
+
+                    // Если файл имеет нужное расширение, загружаем его
+                    if (file.path().extension().string() == targetExt) {
+                        infoLog("GameProcessState::loadRooms", "Загружается файл: " + file.path().string());
+                        std::string fileExt = levelFolder.path().extension().string();
+                        
+                        rooms.push_back(std::make_unique<Room>(textureManager, file.path().string()));
+                    }
+                }
             }            
         }
     } catch (const fs::filesystem_error& e) {
@@ -64,7 +80,6 @@ void GameProcessState::handleInput(const sf::Event::KeyPressed *keyEvent) {
     default:
         break;
     }
-    std::cout << "Player position: " << player->getPosition().x << ", " << player->getPosition().y << std::endl;
 }
 
 void GameProcessState::render(sf::RenderWindow& window) {

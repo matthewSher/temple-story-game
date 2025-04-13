@@ -3,6 +3,7 @@
 #include <memory>
 #include "../include/tools/TileMap.hpp"
 #include "../include/state/GameProcessState.hpp"
+#include "../include/constants/path.h"
 
 Game::Game() {
     infoLog("Game::Game", "Вызван конструктор");
@@ -10,7 +11,7 @@ Game::Game() {
     window = sf::RenderWindow(sf::VideoMode({1280, 720}), "Game");
 
     // Загрузка тайлсета в буфер с ресурсами
-    if (!textureManager.load(TextureKeys::Tileset, "assets/img/tileset.png")) {
+    if (!textureManager.load(TextureKeys::Tileset, TILESET_PATH)) {
         errorLog("Game::Game", "Ошибка загрузки тайлсета");
         throw std::runtime_error("Error loading tileset");
     }
@@ -22,6 +23,7 @@ void Game::run() {
     sf::View view = window.getView();
     view.setSize(sf::Vector2f(window.getSize()) / 3.f);
     // view.setCenter(sf::Vector2f(window.getSize()) / 2.f);
+    window.setFramerateLimit(120);
     window.setView(view);
 
     while (window.isOpen()) {

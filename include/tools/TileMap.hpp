@@ -22,12 +22,12 @@ private:
     // Тайлсет карты тайлов (текстура с набором тайлов)
     const sf::Texture& tilesetTexture;
     // Словарь слоёв карты тайлов
-    std::map<std::string, std::unique_ptr<sf::VertexArray>> layersVertexArray;
+    std::map<std::string, sf::VertexArray> layersVertexArray;
     
     // Возвращает массив вершин для слоя tileLayer тайл карты. Во избежание
     // копирования массива вершин, он обёрнут в умный указатель
-    std::unique_ptr<sf::VertexArray> createVertexArrayForLayer(
-        const tmx::TileLayer& tileLayer, const tmx::Vector2u& mapSize, const tmx::Vector2u& tileSize);
+    sf::VertexArray createVertexArrayForLayer(const tmx::TileLayer& tileLayer, 
+        const tmx::Vector2u& mapSize, const tmx::Vector2u& tileSize);
     
     // Заполняет vertexArray данными для конкретного тайла.
     // x и y - позиции тайла в тайлсете (измеряются в тайлах, не в пикселях!)
