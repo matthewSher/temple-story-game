@@ -3,12 +3,11 @@
 #include <filesystem>
 #include <string>
 #include <iostream>
-
 #include "../../include/constants/path.h"
 
 namespace fs = std::filesystem;
 
-GameProcessState::GameProcessState(ResourceManager<sf::Texture, TextureKeys>& textureManager)
+GameProcessState::GameProcessState(ResourceManager<sf::Texture>& textureManager)
     : textureManager(textureManager) {
     infoLog("GameProcessState::GameProcessState", "Вызван конструктор");
     player = std::make_unique<Player>(textureManager);
