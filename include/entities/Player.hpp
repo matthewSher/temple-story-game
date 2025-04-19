@@ -2,7 +2,6 @@
 
 #include "Character.hpp"
 #include "../tools/ResourceManager_T.hpp"
-#include "../constants/TextureKeys.hpp"
 
 /**
  * Класс Player представляет собой игрового персонажа, управляемого игроком.
@@ -12,8 +11,8 @@
 class Player : public Character {
 private:
     // Метод для создания спрайта игрока, используя менеджер ресурсов
-    sf::Sprite createSprite(ResourceManager<sf::Texture, TextureKeys>& textureManager);
+    sf::Sprite createSprite(ResourceManager<sf::Texture>& textureManager);
 
 public:
-    Player(ResourceManager<sf::Texture, TextureKeys>& textureManager);
+    Player(ResourceManager<sf::Texture>& textureManager);
 };

@@ -11,7 +11,7 @@ Game::Game() {
     window = sf::RenderWindow(sf::VideoMode({1280, 720}), "Game");
 
     // Загрузка тайлсета в буфер с ресурсами
-    if (!textureManager.load(TextureKeys::Tileset, TILESET_PATH)) {
+    if (!textureManager.load("tileset", TILESET_PATH)) {
         errorLog("Game::Game", "Ошибка загрузки тайлсета");
         throw std::runtime_error("Error loading tileset");
     }

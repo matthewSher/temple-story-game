@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <SFML/Graphics.hpp>
-#include "constants/TextureKeys.hpp"
 #include "../include/state/GameProcessState.hpp"
 
 /**
@@ -16,7 +15,7 @@ private:
     // Окно игры
     sf::RenderWindow window;
     // Менеджер текстур служит для загрузки тайлсета из файловой системы
-    ResourceManager<sf::Texture, TextureKeys> textureManager;
+    ResourceManager<sf::Texture> textureManager;
     // Указатель на cостояние игрового процесса
     std::unique_ptr<GameProcessState> gameProcessState;
 public:

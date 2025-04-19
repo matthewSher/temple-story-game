@@ -16,7 +16,7 @@ private:
     // Указатель на объект Player, представляющий игрока в игре
     std::unique_ptr<Player> player;
     // Менеджер ресурсов для загрузки текстур
-    ResourceManager<sf::Texture, TextureKeys> textureManager;
+    ResourceManager<sf::Texture> textureManager;
     // Вектор указателей на объекты Room, представляющие комнаты в игре
     std::vector<std::unique_ptr<Room>> rooms;
     // Индекс комнаты, в которой находится игрок
@@ -26,7 +26,7 @@ private:
     void loadRooms();
 
 public:
-    GameProcessState(ResourceManager<sf::Texture, TextureKeys>& textureManager);
+    GameProcessState(ResourceManager<sf::Texture>& textureManager);
 
     // Метод для установки текущего индекса комнаты
     void setCurrentRoomIndex(int newIndex);

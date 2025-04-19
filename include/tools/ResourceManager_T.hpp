@@ -9,21 +9,21 @@
  * Этот класс является шаблонным, поэтому его реализация находится в заголовочном файле.
  * Класс предназначен для загрузки ресурсов из файловой системы.
  * 
- * Обёрнут шаблонами Resource и Identifier. Первый может быть одним из трёх SFML классов:
+ * Обёрнут шаблонами Resource и std::string. Первый может быть одним из трёх SFML классов:
  * sf::Texture, sf::Font, sf::SoundBuffer. Второй определяет enum class с идентификаторами
  * ресурсов: TextureKeys, FontKeys или SoundKeys.
  */
 
-template <typename Resource, typename Identifier>
+template <typename Resource>
 class ResourceManager {
 private:
     // В этот словарь помещаются все загруженные ресурсы
-    std::map<Identifier, Resource> resources;
+    std::map<std::string, Resource> resources;
 
 public:
     // Метод для загрузки ресурсов. Принимает в качестве аргументов
     // название ресурса (name) и путь к нему (path)
-    bool load(Identifier name, const std::string& path) {
+    bool load(std::string name, const std::string& path) {
         if (resources.find(name) != resources.end()) {
             errorLog("ResourceManager::load", "Ресурс уже загружен");
             return false;
@@ -44,7 +44,7 @@ public:
 
     // Метод, по которому можно получить соответствующий ресурс.
     // В качестве параметра передаётся название ресурса (name)
-    Resource& get(Identifier name) {
+    Resource& get(std::string name) {
         auto it = resources.find(name); // Ищет ресурс по имени внутри map
     
         // Если ресурс не найден
@@ -53,7 +53,7 @@ public:
             throw std::runtime_error("Resources not found");
         }
     
-        // Если ресурс найден, it указывает на пару ключ-значение std::pair<Identifier, Resource>.
+        // Если ресурс найден, it указывает на пару ключ-значение std::pair<std::string, Resource>.
         // Возвращаем сам ресурс, т.е. второе значение
 
         infoLog("ResourceManager::get", "Ресурс успешно получен");
@@ -65,7 +65,7 @@ public:
     // Полезно, когда из тайлсета нужно вырезать один конкретный тайл
     template <typename T = Resource>
     std::enable_if_t<std::is_same_v<T, sf::Texture>, sf::Texture&>
-    getSubTexture(Identifier sourceTextureName, Identifier name, const sf::IntRect& rect) {
+    getSubTexture(std::string sourceTextureName, std::string name, const sf::IntRect& rect) {
         auto it = resources.find(name);
         if (it != resources.end()) return it->second;
 
