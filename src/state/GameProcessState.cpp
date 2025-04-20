@@ -76,6 +76,9 @@ void GameProcessState::handleInput(const sf::Event::KeyPressed *keyEvent) {
             player->move({0, 1});
         }
         break;
+    case sf::Keyboard::Key::E:
+        rooms[currentRoomIndex]->interactWithStaticObjectAt(player->getPosition());
+        break;
     default:
         break;
     }

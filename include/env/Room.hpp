@@ -18,7 +18,7 @@ private:
     // Указатель на объект TileMap, который представляет собой тайловую карту комнаты
     std::unique_ptr<TileMap> roomTilemap;
     // Массив, хранящий все предметы, находящиеся в комнате
-    std::vector<StaticObject> staticObjects;
+    std::vector<std::unique_ptr<StaticObject>> staticObjects;
 
     // Помещает в вектор staticObjects объекты по файлу-конфигурации,
     // расположенному по пути filepath
@@ -30,8 +30,11 @@ public:
     Room(ResourceManager<sf::Texture>& textureManager, const std::string& tilemapPath);
 
     // Метод для проверки коллизий между объектом и тайлом
-    // position - позиция объекта, с которым проверяется коллизия (в пикселях)
+    // position - позиция объекта, с которым проверяется коллизия (в тайлах)
     bool checkCollision(const sf::Vector2f& position) const;
+    // Метод для взаимодействия с статическим объектом
+    // playerPosition - позиция игрока (в тайлах)
+    void interactWithStaticObjectAt(const sf::Vector2f& playerPosition);
     // Отрисовка комнаты на экране
     void render(sf::RenderWindow& window);
 };

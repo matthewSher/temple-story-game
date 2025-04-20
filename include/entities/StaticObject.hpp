@@ -9,7 +9,8 @@
 class StaticObject : public Entity {
 public:
     StaticObject(sf::Vector2f p, sf::Sprite s);
+    virtual ~StaticObject() = default;
 
     // Метод для взаимодействия с объектом
-    void interact();
+    virtual void interact();
 };

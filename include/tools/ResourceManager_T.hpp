@@ -13,7 +13,6 @@
  * sf::Texture, sf::Font, sf::SoundBuffer. Второй определяет enum class с идентификаторами
  * ресурсов: TextureKeys, FontKeys или SoundKeys.
  */
-
 template <typename Resource>
 class ResourceManager {
 private:
@@ -31,32 +30,32 @@ public:
     
         Resource resource;
         if (!resource.loadFromFile(path)) {
-            errorLog("ResourceManager::load", "Ошибка загрузки ресурса");
+            errorLog("ResourceManager::load", "Ошибка загрузки ресурса" + name);
             return false;
         }
     
         // Помещаем ресурс в map
         resources[name] = std::move(resource);
 
-        infoLog("ResourceManager::load", "Ресурс успешно загружен");
+        infoLog("ResourceManager::load", "Ресурс " + name + " успешно загружен");
         return true;
     }
 
     // Метод, по которому можно получить соответствующий ресурс.
     // В качестве параметра передаётся название ресурса (name)
-    Resource& get(std::string name) {
+    Resource& get(const std::string& name) {
         auto it = resources.find(name); // Ищет ресурс по имени внутри map
     
         // Если ресурс не найден
         if (it == resources.end()) {
-            errorLog("ResourceManager::get", "Ресурс не найден");
+            errorLog("ResourceManager::get", "Ресурс " + name + " не найден");
             throw std::runtime_error("Resources not found");
         }
     
         // Если ресурс найден, it указывает на пару ключ-значение std::pair<std::string, Resource>.
         // Возвращаем сам ресурс, т.е. второе значение
 
-        infoLog("ResourceManager::get", "Ресурс успешно получен");
+        infoLog("ResourceManager::get", "Ресурс " + name + " успешно получен");
         return it->second;
     }
 
@@ -78,7 +77,7 @@ public:
         }
         resources[name] = std::move(subTexture);
 
-        infoLog("ResourceManager::getSubTexture", "Подтекстура получена");
+        infoLog("ResourceManager::getSubTexture", "Подтекстура " + name + " успешно загружена");
         return resources[name];
     }
 };
