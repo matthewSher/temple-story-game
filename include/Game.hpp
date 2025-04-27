@@ -3,6 +3,8 @@
 #include <memory>
 #include <SFML/Graphics.hpp>
 #include "../include/state/GameProcessState.hpp"
+#include "../include/tools/Camera.hpp"
+#include "../include/constants/game_settings.hpp"
 
 /**
  * Класс Game представляет собой основную игровую логику и управление игровым процессом.
@@ -18,6 +20,12 @@ private:
     ResourceManager<sf::Texture> textureManager;
     // Указатель на cостояние игрового процесса
     std::unique_ptr<GameProcessState> gameProcessState;
+    std::unique_ptr<Camera> camera;
+
+    void handleEvents();
+    void update();
+    void render();
+
 public:
     Game();
 
