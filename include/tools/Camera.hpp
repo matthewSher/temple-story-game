@@ -23,4 +23,6 @@ public:
     void handleInput(const sf::Event::KeyPressed* keyEvent);
     // Применяет вид камеры к окну
     void apply(sf::RenderWindow& window);
+    // Устанавливает центр камеры
+    void setCenter(const sf::Vector2f& center);
 }; 

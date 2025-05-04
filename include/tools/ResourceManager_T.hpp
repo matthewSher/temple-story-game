@@ -9,9 +9,8 @@
  * Этот класс является шаблонным, поэтому его реализация находится в заголовочном файле.
  * Класс предназначен для загрузки ресурсов из файловой системы.
  * 
- * Обёрнут шаблонами Resource и std::string. Первый может быть одним из трёх SFML классов:
- * sf::Texture, sf::Font, sf::SoundBuffer. Второй определяет enum class с идентификаторами
- * ресурсов: TextureKeys, FontKeys или SoundKeys.
+ * Обёрнут шаблоном Resource, который может быть одним из трёх SFML классов:
+ * sf::Texture, sf::Font, sf::SoundBuffer.
  */
 template <typename Resource>
 class ResourceManager {
@@ -20,27 +19,6 @@ private:
     std::map<std::string, Resource> resources;
 
 public:
-    // Метод для загрузки ресурсов. Принимает в качестве аргументов
-    // название ресурса (name) и путь к нему (path)
-    bool load(std::string name, const std::string& path) {
-        if (resources.find(name) != resources.end()) {
-            errorLog("ResourceManager::load", "Ресурс уже загружен");
-            return false;
-        }
-    
-        Resource resource;
-        if (!resource.loadFromFile(path)) {
-            errorLog("ResourceManager::load", "Ошибка загрузки ресурса" + name);
-            return false;
-        }
-    
-        // Помещаем ресурс в map
-        resources[name] = std::move(resource);
-
-        infoLog("ResourceManager::load", "Ресурс " + name + " успешно загружен");
-        return true;
-    }
-
     // Метод, по которому можно получить соответствующий ресурс.
     // В качестве параметра передаётся название ресурса (name)
     Resource& get(const std::string& name) {
@@ -57,6 +35,36 @@ public:
 
         infoLog("ResourceManager::get", "Ресурс " + name + " успешно получен");
         return it->second;
+    }
+
+    // Метод для загрузки ресурсов. Принимает в качестве аргументов
+    // название ресурса (name) и путь к нему (path)
+    template <typename T = Resource>
+    bool load(std::string name, const std::string& path) {
+        if (resources.find(name) != resources.end()) {
+            errorLog("ResourceManager::load", "Ресурс уже загружен");
+            return false;
+        }
+
+        Resource resource;
+        bool loadResult = false;
+        
+        // Условный оператор для определения типа ресурса
+        // Выполняется только на этапе компиляции
+        if constexpr (std::is_same_v<T, sf::Texture>) {
+            loadResult = resource.loadFromFile(path);
+        } else if constexpr (std::is_same_v<T, sf::Font>) {
+            loadResult = resource.openFromFile(path);
+        }
+
+        if (!loadResult) {
+            errorLog("ResourceManager::load", "Ошибка загрузки ресурса" + name);
+            return false;
+        }
+
+        resources[name] = std::move(resource);
+        infoLog("ResourceManager::load", "Ресурс " + name + " успешно загружен");
+        return true;
     }
 
     // Вырезает из текстуры с именем (sourceTextureName) прямоугольник с координатами (rect).

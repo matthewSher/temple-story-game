@@ -32,7 +32,7 @@ void Room::placeStaticObjectsByConfigFile(const std::string& filepath) {
     std::string line;
 
     if (!staticObjectsConfigFile.is_open()) {
-        errorLog("Room::placeStaticObjects", "Не удалось открыть файл");
+        errorLog("Room::placeStaticObjectsByConfigFile", "Не удалось открыть файл");
         return;
     }
 
@@ -53,7 +53,7 @@ void Room::placeStaticObjectsByConfigFile(const std::string& filepath) {
         // Последовательно читаем строку
         lineStream >> xCoordInTiles >> yCoordInTiles >> textureId >> objectName;
         if (lineStream.fail()) {
-            errorLog("Room::placeStaticObjects", "Ошибка при считывании строки: " + line);
+            errorLog("Room::placeStaticObjectsByConfigFile", "Ошибка при считывании строки: " + line);
             continue;
         }
         
@@ -69,11 +69,11 @@ void Room::placeStaticObjectsByConfigFile(const std::string& filepath) {
         StaticObjectFactory& factory = StaticObjectFactory::getInstance();
         auto so = factory.createObject(objectName, {xCoord, yCoord}, sf::Sprite(soTexture));
         if (!so) {
-            errorLog("Room::placeStaticObjects", "Не удалось создать объект: " + objectName);
+            errorLog("Room::placeStaticObjectsByConfigFile", "Не удалось создать объект: " + objectName);
             continue;
         }
-        staticObjects.push_back(std::move(so)); // Добавляем объект в массив staticObjects
-        infoLog("Room::placeStaticObjects", "Создан объект: " + objectName + 
+        staticObjects.push_back(std::move(so));
+        infoLog("Room::placeStaticObjectsByConfigFile", "Создан объект: " + objectName + 
                 " с ID текстуры: " + std::to_string(textureId) +
                 " по координатам: (" + std::to_string(xCoord) + ", " + std::to_string(yCoord) + ")");
     }   
@@ -125,8 +125,21 @@ bool Room::checkCollision(const sf::Vector2f& position) const {
 }
 
 void Room::render(sf::RenderWindow& window) {
-    window.draw(*roomTilemap);
-    for (const auto& so : staticObjects) {
-        window.draw(*so);
+    try {
+        if (!roomTilemap) {
+            errorLog("Room::render", "TileMap не инициализирован");
+            return;
+        }
+
+        window.draw(*roomTilemap);
+
+        for (const auto& so : staticObjects) {
+            if (so) {
+                window.draw(*so);
+            }
+        }
+    } catch (const std::exception& e) {
+        errorLog("Room::render", "Ошибка при отрисовке: " + std::string(e.what()));
+        throw;
     }
 }

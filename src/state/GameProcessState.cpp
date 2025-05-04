@@ -4,14 +4,13 @@
 #include <string>
 #include <iostream>
 #include "../../include/constants/path.h"
+#include "../../include/constants/main_constants.h"
+#include "../../include/Game.hpp"
 
 namespace fs = std::filesystem;
 
-GameProcessState::GameProcessState(ResourceManager<sf::Texture>& textureManager)
-    : textureManager(textureManager) {
+GameProcessState::GameProcessState(Game* context) : GameState(context) {
     infoLog("GameProcessState::GameProcessState", "Вызван конструктор");
-    player = std::make_unique<Player>(textureManager);
-    loadRooms();
 }
 
 void GameProcessState::loadRooms() {
@@ -19,6 +18,12 @@ void GameProcessState::loadRooms() {
     std::string targetExt = ".tmx";
 
     try {
+        // Проверка существования директории с уровнями
+        if (!fs::exists(levelsFolder)) {
+            errorLog("GameProcessState::loadRooms", "Директория с уровнями не существует: " + levelsFolder);
+            throw std::runtime_error("Levels directory does not exist");
+        }
+
         // Перебор всех папок в levelsFolder
         for (const auto& levelFolder : fs::directory_iterator(levelsFolder)) {
             if (!levelFolder.is_directory()) continue;
@@ -31,18 +36,17 @@ void GameProcessState::loadRooms() {
                 for (const auto& file : fs::directory_iterator(roomFolder)) {
                     if (!file.is_regular_file()) continue;
 
-                    // Если файл имеет нужное расширение, загружаем его
                     if (file.path().extension().string() == targetExt) {
                         infoLog("GameProcessState::loadRooms", "Загружается файл: " + file.path().string());
-                        std::string fileExt = levelFolder.path().extension().string();
-                        
-                        rooms.push_back(std::make_unique<Room>(textureManager, file.path().string()));
+                        rooms.push_back(std::make_unique<Room>(context->getTextureManager(), file.path().string()));
+                        break;
                     }
                 }
             }            
         }
     } catch (const fs::filesystem_error& e) {
-        errorLog("GameProcessState::loadRooms", "Ошибка при чтении файлов");
+        errorLog("GameProcessState::loadRooms", "Ошибка при чтении файлов: " + std::string(e.what()));
+        throw;
     }
 }
 
@@ -54,37 +58,114 @@ void GameProcessState::setCurrentRoomIndex(int newIndex) {
     currentRoomIndex = newIndex;
 }
 
-void GameProcessState::handleInput(const sf::Event::KeyPressed *keyEvent) {
-    switch (keyEvent->code) {
-    case sf::Keyboard::Key::A:
-        if (!rooms[currentRoomIndex]->checkCollision(player->getPosition() + sf::Vector2f(-1, 0))) {
-            player->move({-1, 0});
+void GameProcessState::handleInput(const sf::Event& event) {
+    if (rooms.empty()) return;
+    
+    if (auto keyEvent = event.getIf<sf::Event::KeyPressed>()) {
+        if (auto* camera = context->getCamera()) {
+            camera->handleInput(keyEvent);
         }
-        break;
-    case sf::Keyboard::Key::D:
-        if (!rooms[currentRoomIndex]->checkCollision(player->getPosition() + sf::Vector2f(1, 0))) {
-            player->move({1, 0});
+
+        switch (keyEvent->code) {
+        case sf::Keyboard::Key::A:
+            if (!rooms[currentRoomIndex]->checkCollision(player->getPosition() + sf::Vector2f(-1, 0))) {
+                player->move({-1, 0});
+            }
+            break;
+        case sf::Keyboard::Key::D:
+            if (!rooms[currentRoomIndex]->checkCollision(player->getPosition() + sf::Vector2f(1, 0))) {
+                player->move({1, 0});
+            }
+            break;
+        case sf::Keyboard::Key::W:
+            if (!rooms[currentRoomIndex]->checkCollision(player->getPosition() + sf::Vector2f(0, -1))) {
+                player->move({0, -1});
+            }
+            break;
+        case sf::Keyboard::Key::S:
+            if (!rooms[currentRoomIndex]->checkCollision(player->getPosition() + sf::Vector2f(0, 1))) {
+                player->move({0, 1});
+            }
+            break;
+        case sf::Keyboard::Key::E:
+            rooms[currentRoomIndex]->interactWithStaticObjectAt(player->getPosition());
+            break;
+        default:
+            break;
         }
-        break;
-    case sf::Keyboard::Key::W:
-        if (!rooms[currentRoomIndex]->checkCollision(player->getPosition() + sf::Vector2f(0, -1))) {
-            player->move({0, -1});
-        }
-        break;
-    case sf::Keyboard::Key::S:
-        if (!rooms[currentRoomIndex]->checkCollision(player->getPosition() + sf::Vector2f(0, 1))) {
-            player->move({0, 1});
-        }
-        break;
-    case sf::Keyboard::Key::E:
-        rooms[currentRoomIndex]->interactWithStaticObjectAt(player->getPosition());
-        break;
-    default:
-        break;
     }
 }
 
+void GameProcessState::onEnter() {
+    try {
+        infoLog("GameProcessState::onEnter", "Начало инициализации");
+        
+        player = std::make_unique<Player>(context->getTextureManager());
+        if (!player) {
+            errorLog("GameProcessState::onEnter", "Не удалось создать игрока");
+            throw std::runtime_error("Failed to create player");
+        }
+        infoLog("GameProcessState::onEnter", "Игрок успешно создан");
+
+        loadRooms();
+        
+        // Проверяем, что комнаты загружены
+        if (rooms.empty()) {
+            errorLog("GameProcessState::onEnter", "Не удалось загрузить комнаты");
+            throw std::runtime_error("Failed to load rooms");
+        }
+        infoLog("GameProcessState::onEnter", "Комнаты загружены");
+
+        // Устанавливаем начальный индекс комнаты
+        currentRoomIndex = 0;
+        infoLog("GameProcessState::onEnter", "Установлен начальный индекс комнаты: " + std::to_string(currentRoomIndex));
+        
+        // Устанавливаем начальную позицию камеры на игрока
+        if (auto* camera = context->getCamera()) {
+            sf::Vector2f playerPos = player->getPosition();
+            sf::Vector2f pixelPos = {playerPos.x * TILE_SIZE, playerPos.y * TILE_SIZE};
+            camera->setCenter(pixelPos);
+        } else {
+            errorLog("GameProcessState::onEnter", "Камера не найдена");
+        }
+    } catch (const std::exception& e) {
+        errorLog("GameProcessState::onEnter", "Ошибка при инициализации: " + std::string(e.what()));
+        throw;
+    }
+}
+
+void GameProcessState::onExit() {
+    infoLog("GameProcessState::onExit", "Вызван метод onExit");
+}
+
 void GameProcessState::render(sf::RenderWindow& window) {
-    rooms[currentRoomIndex]->render(window);
-    window.draw(*player);
+    try {
+        infoLog("GameProcessState::render", "Начало отрисовки");
+        
+        if (rooms.empty()) {
+            errorLog("GameProcessState::render", "Вектор комнат пуст");
+            return;
+        }
+        
+        if (currentRoomIndex >= rooms.size()) {
+            errorLog("GameProcessState::render", "Индекс текущей комнаты вне диапазона: " + 
+                std::to_string(currentRoomIndex) + " >= " + std::to_string(rooms.size()));
+            return;
+        }
+
+        infoLog("GameProcessState::render", "Отрисовка комнаты с индексом: " + std::to_string(currentRoomIndex));
+        rooms[currentRoomIndex]->render(window);
+
+        if (player) {
+            infoLog("GameProcessState::render", "Отрисовка игрока");
+            window.draw(*player);
+        } else {
+            errorLog("GameProcessState::render", "Игрок не существует");
+        }
+        
+        infoLog("GameProcessState::render", "Отрисовка завершена");
+    } catch (const std::exception& e) {
+        errorLog("GameProcessState::render", "Ошибка при отрисовке: " + std::string(e.what()));
+        throw;
+    }
 }

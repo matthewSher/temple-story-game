@@ -28,4 +28,8 @@ void Camera::handleInput(const sf::Event::KeyPressed* keyEvent) {
 
 void Camera::apply(sf::RenderWindow& window) {
     window.setView(view);
+}
+
+void Camera::setCenter(const sf::Vector2f& center) {
+    view.setCenter(center);
 } 

@@ -3,9 +3,11 @@
 #include <memory>
 #include "../include/tools/TileMap.hpp"
 #include "../include/state/GameProcessState.hpp"
+#include "../include/state/MenuState.hpp"
 #include "../include/constants/path.h"
+#include "../include/constants/main_constants.h"
 
-Game::Game() {
+Game::Game() : stateManager(this) {
     infoLog("Game::Game", "Вызван конструктор");
 
     window = sf::RenderWindow(sf::VideoMode({GameSettings::WINDOW_WIDTH, GameSettings::WINDOW_HEIGHT}), "Game");
@@ -17,8 +19,16 @@ Game::Game() {
         throw std::runtime_error("Error loading tileset");
     }
 
-    gameProcessState = std::make_unique<GameProcessState>(textureManager);
+    // Загрузка шрифтов в буфер с ресурсами
+    if (!fontManager.load("regular", REGULAR_FONT_PATH) || !fontManager.load("bold", BOLD_FONT_PATH)) {
+        errorLog("Game::Game", "Ошибка загрузки шрифта");
+        throw std::runtime_error("Error loading font");
+    }
+    
     camera = std::make_unique<Camera>(window);
+    
+    // Начинаем с меню
+    pushState(std::make_unique<MenuState>(this));
 }
 
 void Game::handleEvents() {
@@ -28,22 +38,35 @@ void Game::handleEvents() {
             return;
         }
 
-        if (event->is<sf::Event::KeyPressed>()) {
-            const auto* keyEvent = event->getIf<sf::Event::KeyPressed>();
-            gameProcessState->handleInput(keyEvent);
-            camera->handleInput(keyEvent);
+        if (auto* currentState = stateManager.getCurrent()) {
+            currentState->handleInput(*event);
         }
     }
 }
 
 void Game::update() {
-    camera->apply(window);
+    if (camera) {
+        camera->apply(window);
+    }
 }
-
 void Game::render() {
     window.clear();
-    gameProcessState->render(window);
+    if (auto* currentState = stateManager.getCurrent()) {
+        currentState->render(window);
+    }
     window.display();
+}
+
+void Game::pushState(std::unique_ptr<GameState> state) {
+        stateManager.push(std::move(state));
+    }
+    
+void Game::popState() {
+    stateManager.pop();
+}
+
+void Game::changeState(std::unique_ptr<GameState> state) {
+    stateManager.change(std::move(state));
 }
 
 void Game::run() {

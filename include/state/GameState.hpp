@@ -3,6 +3,7 @@
 #include <memory>
 #include <SFML/Graphics.hpp>
 
+class Game;
 
 /**
  * Класс GameState представляет собой абстрактный базовый класс для различных состояний игры.
@@ -11,11 +12,19 @@
  */
 class GameState {
 public:
+    GameState(Game* game) : context(game) {}
     virtual ~GameState() = default;
      
     // Метод для обработки ввода от игрока
     // keyEvent - событие нажатия клавиши, которое нужно обработать
-    virtual void handleInput(const sf::Event::KeyPressed *keyEvent) = 0;
+    virtual void handleInput(const sf::Event& event) = 0;
     // Метод для отрисовки состояния игры на экране
     virtual void render(sf::RenderWindow& window) = 0;
+    // Метод для активации состояния
+    virtual void onEnter() = 0;
+    // Метод для деактивации состояния
+    virtual void onExit() = 0;
+    
+protected:
+    Game* context; // Не может быть null
 };
