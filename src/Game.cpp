@@ -37,9 +37,9 @@ void Game::handleEvents() {
             window.close();
             return;
         }
-
-        if (auto* currentState = stateManager.getCurrent()) {
-            currentState->handleInput(*event);
+        
+        if (stateManager.isStateValid()) {
+            stateManager.handleInput(*event);
         }
     }
 }
@@ -49,17 +49,16 @@ void Game::update() {
         camera->apply(window);
     }
 }
+
 void Game::render() {
     window.clear();
-    if (auto* currentState = stateManager.getCurrent()) {
-        currentState->render(window);
-    }
+    stateManager.renderCurrent(window);
     window.display();
 }
 
 void Game::pushState(std::unique_ptr<GameState> state) {
         stateManager.push(std::move(state));
-    }
+}
     
 void Game::popState() {
     stateManager.pop();
@@ -71,8 +70,8 @@ void Game::changeState(std::unique_ptr<GameState> state) {
 
 void Game::run() {
     while (window.isOpen()) {
+        render();
         handleEvents();
         update();
-        render();
     }
 }

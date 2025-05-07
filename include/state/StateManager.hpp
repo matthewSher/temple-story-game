@@ -18,6 +18,10 @@ public:
         }
     }
 
+    bool isStateValid() const {
+        return !states.empty() && states.top() != nullptr;
+    }
+
     void push(std::unique_ptr<GameState> state) {
         if(!state) return;
         
@@ -34,38 +38,39 @@ public:
     void pop() {
         if(states.empty()) return;
         
-        // Деактивируем текущее состояние
         states.top()->onExit();
         states.pop();
 
-        // Возобновляем предыдущее состояние
         if(!states.empty()) {
             states.top()->onEnter();
         }
     }
 
     void change(std::unique_ptr<GameState> state) {
-        if(!state) return;
+        if (!state) return;    
 
-        try {
-            // Деактивируем все состояния
-            while(!states.empty()) {
-                states.top()->onExit();
-                states.pop();
-            }
-            
-            // Активируем новое состояние
-            infoLog("StateManager::change", "Активируем новое состояние");
-            state->onEnter();
-            states.push(std::move(state));
-        } catch (const std::exception& e) {
-            errorLog("StateManager::change", "Ошибка при смене состояния: " + std::string(e.what()));
-            throw; // Пробрасываем исключение дальше
+        state->onEnter();    
+    
+        if (!states.empty()) {
+            states.top()->onExit();
+            states.pop();
+        }
+
+        states.push(std::move(state));
+    }
+
+    void renderCurrent(sf::RenderWindow& window) {
+        if (!states.empty()) {
+            states.top()->render(window);
         }
     }
 
-    GameState* getCurrent() const {
-        return states.empty() ? nullptr : states.top().get();
+    void handleInput(const sf::Event& event) {
+        if (!states.empty()) {
+            states.top()->handleInput(event);
+        } else {
+            errorLog("StateManager::handleInput", "Текущее состояние не найдено");
+        }
     }
 
 private:

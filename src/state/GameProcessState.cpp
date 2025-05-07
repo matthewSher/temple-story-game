@@ -139,33 +139,17 @@ void GameProcessState::onExit() {
 }
 
 void GameProcessState::render(sf::RenderWindow& window) {
-    try {
-        infoLog("GameProcessState::render", "Начало отрисовки");
-        
-        if (rooms.empty()) {
-            errorLog("GameProcessState::render", "Вектор комнат пуст");
-            return;
-        }
-        
-        if (currentRoomIndex >= rooms.size()) {
-            errorLog("GameProcessState::render", "Индекс текущей комнаты вне диапазона: " + 
-                std::to_string(currentRoomIndex) + " >= " + std::to_string(rooms.size()));
-            return;
-        }
-
-        infoLog("GameProcessState::render", "Отрисовка комнаты с индексом: " + std::to_string(currentRoomIndex));
-        rooms[currentRoomIndex]->render(window);
-
-        if (player) {
-            infoLog("GameProcessState::render", "Отрисовка игрока");
-            window.draw(*player);
-        } else {
-            errorLog("GameProcessState::render", "Игрок не существует");
-        }
-        
-        infoLog("GameProcessState::render", "Отрисовка завершена");
-    } catch (const std::exception& e) {
-        errorLog("GameProcessState::render", "Ошибка при отрисовке: " + std::string(e.what()));
-        throw;
+    if (rooms.empty()) {
+        errorLog("GameProcessState::render", "Вектор комнат пуст");
+        return;
     }
+    
+    if (currentRoomIndex >= rooms.size()) {
+        errorLog("GameProcessState::render", "Индекс текущей комнаты вне диапазона: " + 
+            std::to_string(currentRoomIndex) + " >= " + std::to_string(rooms.size()));
+        return;
+    }
+
+    rooms[currentRoomIndex]->render(window);
+    window.draw(*player);
 }

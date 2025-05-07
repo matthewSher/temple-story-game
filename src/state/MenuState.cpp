@@ -9,10 +9,14 @@ MenuState::MenuState(Game* gameContext) : GameState(gameContext) {
 }
 
 void MenuState::handleInput(const sf::Event& event) {
+    if (!context || !context->getWindow().isOpen()) return;
+    
     // Обработка событий мыши для всех UI элементов
-    for (auto& element : uiElements) {
-        if (element->isElementActive()) {
-            element->handleEvent(event);
+    if (!uiElements.empty()) {
+        for (auto& element : uiElements) {
+            if (element && element->isElementActive()) {
+                element->handleEvent(event);
+            }
         }
     }
 }
@@ -42,6 +46,12 @@ void MenuState::onEnter() {
                 if (context && context->getWindow().isOpen()) {
                     auto newState = std::make_unique<GameProcessState>(context);
                     if (newState) {
+                        // Отключение всех UI элементов перед сменой состояния
+                        for (auto& element : uiElements) {
+                            if (element) {
+                                element->setActive(false);
+                            }
+                        }
                         context->changeState(std::move(newState));
                     } else {
                         errorLog("MenuState::onEnter", "Не удалось создать новое состояние");
