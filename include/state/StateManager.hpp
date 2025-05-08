@@ -7,73 +7,39 @@
 class Game;
 class GameState;
 
+
+/**
+ *  Класс для управления состояниями игры.
+ *  Он отвечает за управление стеком состояний игры,
+ *  добавление новых состояний, удаление верхнего состояния,
+ *  изменение текущего состояния и отрисовку текущего состояния.
+ */
 class StateManager {
 public:
-    // Запрещаем создание без контекста
-    StateManager(Game* gameContext) : context(gameContext) {
-        infoLog("StateManager::StateManager", "Вызван конструктор");
-        if(!context) {
-            errorLog("StateManager::StateManager", "Контекст игры не может быть null");
-            throw std::invalid_argument("Game context cannot be null");
-        }
-    }
+    StateManager(Game* gameContext);
 
-    bool isStateValid() const {
-        return !states.empty() && states.top() != nullptr;
-    }
+    // Существует ли текущее состояние
+    bool isStateValid() const;
 
-    void push(std::unique_ptr<GameState> state) {
-        if(!state) return;
-        
-        // Приостанавливаем текущее состояние
-        if(!states.empty()) {
-            states.top()->onExit();
-        }
+    // Добавляет новое состояние в стек
+    void push(std::unique_ptr<GameState> state);
 
-        // Инициализируем и активируем новое состояние
-        state->onEnter();
-        states.push(std::move(state));
-    }
+    // Удаляет верхнее состояние из стека
+    void pop();
 
-    void pop() {
-        if(states.empty()) return;
-        
-        states.top()->onExit();
-        states.pop();
+    // Меняет текущее состояние на новое
+    void change(std::unique_ptr<GameState> state);
 
-        if(!states.empty()) {
-            states.top()->onEnter();
-        }
-    }
+    // Отрисовывает текущее состояние
+    void renderCurrent(sf::RenderWindow& window);
 
-    void change(std::unique_ptr<GameState> state) {
-        if (!state) return;    
-
-        state->onEnter();    
-    
-        if (!states.empty()) {
-            states.top()->onExit();
-            states.pop();
-        }
-
-        states.push(std::move(state));
-    }
-
-    void renderCurrent(sf::RenderWindow& window) {
-        if (!states.empty()) {
-            states.top()->render(window);
-        }
-    }
-
-    void handleInput(const sf::Event& event) {
-        if (!states.empty()) {
-            states.top()->handleInput(event);
-        } else {
-            errorLog("StateManager::handleInput", "Текущее состояние не найдено");
-        }
-    }
+    // Обрабатывает события ввода
+    void handleInput(const sf::Event& event);
 
 private:
+    // Стек состояний
     std::stack<std::unique_ptr<GameState>> states;
+
+    // Контекст игры.
     Game* context;
 };

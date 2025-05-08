@@ -14,6 +14,7 @@ protected:
     sf::Vector2f size;
     bool isVisible = true;
     bool isActive = true;
+    const sf::View* cameraView = nullptr;
 
 public:
     UIElement(const sf::Vector2f& pos, const sf::Vector2f& size);
@@ -23,16 +24,17 @@ public:
     virtual void render(sf::RenderWindow& window) = 0;
     
     // Обработка событий
-    virtual void handleEvent(const sf::Event& event) = 0;
+    virtual void handleEvent(const sf::Event& event, const sf::RenderWindow& window) = 0;
     
     // Проверка, находится ли точка внутри элемента
-    virtual bool contains(const sf::Vector2f& point) const;
+    virtual bool contains(const sf::Vector2f& point, const sf::RenderWindow& window) const;
 
     // Геттеры и сеттеры
     void setPosition(const sf::Vector2f& pos);
     void setSize(const sf::Vector2f& newSize);
     void setVisible(bool visible);
     void setActive(bool active);
+    void setCameraView(const sf::View* view);
 
     const sf::Vector2f& getPosition() const;
     const sf::Vector2f& getSize() const;

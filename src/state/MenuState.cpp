@@ -15,7 +15,7 @@ void MenuState::handleInput(const sf::Event& event) {
     if (!uiElements.empty()) {
         for (auto& element : uiElements) {
             if (element && element->isElementActive()) {
-                element->handleEvent(event);
+                element->handleEvent(event, context->getWindow());
             }
         }
     }
@@ -37,8 +37,8 @@ void MenuState::onEnter() {
 
     // Кнопка "Начать игру"
     auto startButton = std::make_unique<Button>(
-        sf::Vector2f(400, 300),     // Позиция
-        sf::Vector2f(200, 50),      // Размер
+        sf::Vector2f(590, 320),     // Позиция
+        sf::Vector2f(100, 25),      // Размер
         "Начать игру",              // Текст
         fontManager.get("regular"), // Шрифт
         [this]() {                  // Callback
@@ -62,13 +62,13 @@ void MenuState::onEnter() {
             }
         }
     );
-    startButton->setColors(sf::Color(100, 100, 100), sf::Color(150, 150, 150));
+    startButton->setCameraView(&context->getWindow().getView());
     addUIElement(std::move(startButton));
 
     // Кнопка "Выйти из игры"
     auto exitButton = std::make_unique<Button>(
-        sf::Vector2f(400, 400),     // Позиция
-        sf::Vector2f(200, 50),      // Размер
+        sf::Vector2f(585, 380),     // Позиция
+        sf::Vector2f(110, 25),      // Размер
         "Выйти из игры",            // Текст
         fontManager.get("regular"), // Шрифт
         [this]() {                  // Callback
@@ -77,7 +77,7 @@ void MenuState::onEnter() {
             }
         }
     );
-    exitButton->setColors(sf::Color(100, 100, 100), sf::Color(150, 150, 150));
+    exitButton->setCameraView(&context->getWindow().getView());
     addUIElement(std::move(exitButton));
 }
 
