@@ -1,0 +1,8 @@
+[
+    {
+      "tile_coords": [15, 3],
+      "tile_id": 3529,
+      "object_name": "Letter",
+      "letter_text": "Hello, world!"
+    }
+]

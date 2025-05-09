@@ -2,7 +2,7 @@
 
 #include <filesystem>
 #include <fstream>
-#include <sstream>
+#include <nlohmann/json.hpp>
 #include "../../include/utils/logging.h"
 #include "../../include/tools/ResourceManager_T.hpp"
 #include "../../include/constants/main_constants.h"
@@ -10,6 +10,7 @@
 #include "../../include/utils/utils_functions.h"
 #include "../../include/tools/StaticObjectFactory.hpp"
 
+using json = nlohmann::json;
 namespace fs = std::filesystem;
 
 Room::Room(ResourceManager<sf::Texture>& textureManager, const std::string& tilemapPath)
@@ -28,55 +29,85 @@ Room::Room(ResourceManager<sf::Texture>& textureManager, const std::string& tile
 }
 
 void Room::placeStaticObjectsByConfigFile(const std::string& filepath) {
+    // Данные об объектах хранятся в json файле
     std::ifstream  staticObjectsConfigFile(filepath);
-    std::string line;
+    // Читаем данные из json файла
+    json staticObjectsData = json::parse(staticObjectsConfigFile);
 
     if (!staticObjectsConfigFile.is_open()) {
         errorLog("Room::placeStaticObjectsByConfigFile", "Не удалось открыть файл");
         return;
     }
 
-    // Каждая считываемая строка имеет следующий формат:
-    // <число> <число> <число>
-    // Например:
-    // 12 10 2000
-    // 1 2 3
-    // и т.д.
-    // Первые два числа будут считываться как координаты расположения
-    // статического объекта (в тайлах!), а вторая - ID текстуры для объекта в тайлсете
-    while (std::getline(staticObjectsConfigFile, line)) {
-        std::istringstream lineStream(line);
-        int xCoordInTiles, yCoordInTiles; // Координаты позиции объекта (в тайлах)
-        int textureId;
-        std::string objectName;
+    // Перебор всех объектов в json файле
+    for (const auto& object : staticObjectsData) {
+        // Перевод координат из тайлов в пиксели
+        float xCoord = static_cast<float>(object["tile_coords"][0]) * TILE_SIZE;
+        float yCoord = static_cast<float>(object["tile_coords"][1]) * TILE_SIZE;
+        int textureId = object["tile_id"];              // ID текстуры объекта
+        std::string objectName = object["object_name"]; // Имя объекта
 
-        // Последовательно читаем строку
-        lineStream >> xCoordInTiles >> yCoordInTiles >> textureId >> objectName;
-        if (lineStream.fail()) {
-            errorLog("Room::placeStaticObjectsByConfigFile", "Ошибка при считывании строки: " + line);
-            continue;
-        }
-        
-        float xCoord = static_cast<float>(xCoordInTiles * TILE_SIZE);
-        float yCoord = static_cast<float>(yCoordInTiles * TILE_SIZE);
-        
         // Загрузка текстуры объекта
+        // rect - прямоугольник с координатами (x, y) и размерами (TILE_SIZE, TILE_SIZE),
+        // по нему текстура объекта будет вырезана из тайлсета
         sf::IntRect rect(getTileCoordsById(textureId), {TILE_SIZE, TILE_SIZE});
+        // "Вырезание" текстуры объекта из тайлсета
         const sf::Texture& soTexture = textureManager.getSubTexture("tileset", objectName, rect);
 
-        // Создание объекта статического объекта
-        // Используем фабрику для создания статических объектов
+        // Экземпляр объекта создается при помощи соответствующей фабрики
+        // и передается в вектор staticObjects
         StaticObjectFactory& factory = StaticObjectFactory::getInstance();
         auto so = factory.createObject(objectName, {xCoord, yCoord}, sf::Sprite(soTexture));
+
         if (!so) {
             errorLog("Room::placeStaticObjectsByConfigFile", "Не удалось создать объект: " + objectName);
             continue;
         }
+
+        // Добавление объекта в вектор staticObjects
         staticObjects.push_back(std::move(so));
         infoLog("Room::placeStaticObjectsByConfigFile", "Создан объект: " + objectName + 
                 " с ID текстуры: " + std::to_string(textureId) +
-                " по координатам: (" + std::to_string(xCoord) + ", " + std::to_string(yCoord) + ")");
-    }   
+                " по координатам: (" + std::to_string(static_cast<int>(xCoord)) + 
+                ", " + std::to_string(static_cast<int>(yCoord)) + ")"
+        );
+    }
+
+    // while (std::getline(staticObjectsConfigFile, line)) {
+    //     std::istringstream lineStream(line);
+    //     int xCoordInTiles, yCoordInTiles; // Координаты позиции объекта (в тайлах)
+    //     int textureId;
+    //     std::string objectName;
+
+    //     // Последовательно читаем строку
+    //     lineStream >> xCoordInTiles >> yCoordInTiles >> textureId >> objectName;
+    //     if (lineStream.fail()) {
+    //         errorLog("Room::placeStaticObjectsByConfigFile", "Ошибка при считывании строки: " + line);
+    //         continue;
+    //     }
+        
+    //     float xCoord = static_cast<float>(xCoordInTiles * TILE_SIZE);
+    //     float yCoord = static_cast<float>(yCoordInTiles * TILE_SIZE);
+        
+    //     // Загрузка текстуры объекта
+    //     sf::IntRect rect(getTileCoordsById(textureId), {TILE_SIZE, TILE_SIZE});
+    //     const sf::Texture& soTexture = textureManager.getSubTexture("tileset", objectName, rect);
+
+    //     // Создание объекта статического объекта
+    //     // Используем фабрику для создания статических объектов
+    //     StaticObjectFactory& factory = StaticObjectFactory::getInstance();
+    //     auto so = factory.createObject(objectName, {xCoord, yCoord}, sf::Sprite(soTexture));
+    //     if (!so) {
+    //         errorLog("Room::placeStaticObjectsByConfigFile", "Не удалось создать объект: " + objectName);
+    //         continue;
+    //     }
+    //     staticObjects.push_back(std::move(so));
+    //     infoLog("Room::placeStaticObjectsByConfigFile", "Создан объект: " + objectName + 
+    //             " с ID текстуры: " + std::to_string(textureId) +
+    //             " по координатам: (" + std::to_string(static_cast<int>(xCoord)) + 
+    //             ", " + std::to_string(static_cast<int>(yCoord)) + ")"
+    //     );
+    // }   
 }
 
 void Room::loadStaticObjects() {
