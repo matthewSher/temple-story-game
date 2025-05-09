@@ -5,8 +5,8 @@
 
 StaticObjectFactory::StaticObjectFactory() {
     // Регистрация статических объектов
-    registerObject("Letter", [](sf::Vector2f position, sf::Sprite sprite) {
-        return std::make_unique<Letter>(position, sprite);
+    registerObject("Letter", [](sf::Vector2f position, sf::Sprite sprite, const json& objectData) {
+        return std::make_unique<Letter>(position, sprite, objectData["letter_text"].get<std::string>());
     });
 }
 
@@ -20,15 +20,17 @@ void StaticObjectFactory::registerObject(const std::string &objectName, Creator 
 }
 
 std::unique_ptr<StaticObject> StaticObjectFactory::createObject(
-    const std::string &objectName, sf::Vector2f position, sf::Sprite sprite
+    const json& objectData, sf::Vector2f position, sf::Sprite sprite
 ){
-    auto it = creators.find(objectName);
+    auto it = creators.find(objectData["object_name"]);
     if (it != creators.end()) {
         // Вызов метода создания объекта по имени
         // it->second - это функция, которая создаёт объект (Creator)
-        return it->second(position, sprite);
+        return it->second(position, sprite, objectData);
     } else {
-        errorLog("StaticObjectFactory::createObject", "Объект " + objectName + " не зарегистрирован");
+        errorLog("StaticObjectFactory::createObject", 
+            "Объект " + objectData["object_name"].get<std::string>() + " не зарегистрирован"
+        );
         return nullptr;
     }
 }

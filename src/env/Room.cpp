@@ -57,7 +57,7 @@ void Room::placeStaticObjectsByConfigFile(const std::string& filepath) {
         // Экземпляр объекта создается при помощи соответствующей фабрики
         // и передается в вектор staticObjects
         StaticObjectFactory& factory = StaticObjectFactory::getInstance();
-        auto so = factory.createObject(objectName, {xCoord, yCoord}, sf::Sprite(soTexture));
+        auto so = factory.createObject(object, {xCoord, yCoord}, sf::Sprite(soTexture));
 
         if (!so) {
             errorLog("Room::placeStaticObjectsByConfigFile", "Не удалось создать объект: " + objectName);
@@ -72,42 +72,6 @@ void Room::placeStaticObjectsByConfigFile(const std::string& filepath) {
                 ", " + std::to_string(static_cast<int>(yCoord)) + ")"
         );
     }
-
-    // while (std::getline(staticObjectsConfigFile, line)) {
-    //     std::istringstream lineStream(line);
-    //     int xCoordInTiles, yCoordInTiles; // Координаты позиции объекта (в тайлах)
-    //     int textureId;
-    //     std::string objectName;
-
-    //     // Последовательно читаем строку
-    //     lineStream >> xCoordInTiles >> yCoordInTiles >> textureId >> objectName;
-    //     if (lineStream.fail()) {
-    //         errorLog("Room::placeStaticObjectsByConfigFile", "Ошибка при считывании строки: " + line);
-    //         continue;
-    //     }
-        
-    //     float xCoord = static_cast<float>(xCoordInTiles * TILE_SIZE);
-    //     float yCoord = static_cast<float>(yCoordInTiles * TILE_SIZE);
-        
-    //     // Загрузка текстуры объекта
-    //     sf::IntRect rect(getTileCoordsById(textureId), {TILE_SIZE, TILE_SIZE});
-    //     const sf::Texture& soTexture = textureManager.getSubTexture("tileset", objectName, rect);
-
-    //     // Создание объекта статического объекта
-    //     // Используем фабрику для создания статических объектов
-    //     StaticObjectFactory& factory = StaticObjectFactory::getInstance();
-    //     auto so = factory.createObject(objectName, {xCoord, yCoord}, sf::Sprite(soTexture));
-    //     if (!so) {
-    //         errorLog("Room::placeStaticObjectsByConfigFile", "Не удалось создать объект: " + objectName);
-    //         continue;
-    //     }
-    //     staticObjects.push_back(std::move(so));
-    //     infoLog("Room::placeStaticObjectsByConfigFile", "Создан объект: " + objectName + 
-    //             " с ID текстуры: " + std::to_string(textureId) +
-    //             " по координатам: (" + std::to_string(static_cast<int>(xCoord)) + 
-    //             ", " + std::to_string(static_cast<int>(yCoord)) + ")"
-    //     );
-    // }   
 }
 
 void Room::loadStaticObjects() {

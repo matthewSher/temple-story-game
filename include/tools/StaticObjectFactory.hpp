@@ -5,7 +5,10 @@
 #include <functional>
 #include <memory>
 #include <SFML/Graphics.hpp>
+#include <nlohmann/json.hpp>
 #include "../entities/StaticObject.hpp"
+
+using json = nlohmann::json;
 
 /**
  * Класс StaticObjectFactory отвечает за создание статических объектов в игре.
@@ -16,7 +19,7 @@
  */
 class StaticObjectFactory {
     // Тип для функции создания статического объекта
-    using Creator = std::function<std::unique_ptr<StaticObject>(const sf::Vector2f, const sf::Sprite)>;
+    using Creator = std::function<std::unique_ptr<StaticObject>(const sf::Vector2f, const sf::Sprite, const json& objectData)>;
 private:
     // Хранит функции создания статических объектов
     std::unordered_map<std::string, Creator> creators;
@@ -33,6 +36,6 @@ public:
     // Метод для создания статического объекта по имени
     // Принимает имя объекта, позицию и спрайт
     std::unique_ptr<StaticObject> createObject(
-        const std::string& objectName, sf::Vector2f position, sf::Sprite sprite
+        const json& objectData, sf::Vector2f position, sf::Sprite sprite
     );
 };

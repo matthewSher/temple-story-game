@@ -12,5 +12,5 @@ public:
     virtual ~StaticObject() = default;
 
     // Метод для взаимодействия с объектом
-    virtual void interact();
+    virtual void interact() = 0;
 };
