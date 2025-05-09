@@ -17,8 +17,12 @@ FetchContent_MakeAvailable(SFML)
 add_subdirectory(external/tmxlite/tmxlite)
 include_directories(external/tmxlite/tmxlite/include)
 
+# Подключение nlohmann/json
+add_subdirectory(external/json)
+include_directories(external/json/include)
+
 file(GLOB_RECURSE SOURCES "src/*.cpp" "include/*.hpp")
 add_executable(main ${SOURCES})
 
 target_compile_features(main PRIVATE cxx_std_17)
-target_link_libraries(main PRIVATE tmxlite SFML::Graphics SFML::Audio)
+target_link_libraries(main PRIVATE tmxlite SFML::Graphics SFML::Audio nlohmann_json::nlohmann_json)
