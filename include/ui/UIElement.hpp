@@ -10,11 +10,13 @@
  */
 class UIElement {
 protected:
-    sf::Vector2f position;
-    sf::Vector2f size;
-    bool isVisible = true;
-    bool isActive = true;
-    const sf::View* cameraView = nullptr;
+    sf::Vector2f position;                   // Позиция элемента
+    sf::Vector2f size;                       // Размер элемента
+    bool isVisible = true;                   // Видимость элемента
+    bool isActive = true;                    // Возможность взаимодействия с элементом
+    // Поле используется для корректной обработки взаимодействия
+    // с элементами UI в контексте камеры игры
+    const sf::View* cameraView = nullptr;    
 
 public:
     UIElement(const sf::Vector2f& pos, const sf::Vector2f& size);

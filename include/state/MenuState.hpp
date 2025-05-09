@@ -24,7 +24,7 @@ public:
     void handleInput(const sf::Event& event) override;
     // Добавление UI элемента в вектор
     void addUIElement(std::unique_ptr<UIElement> element);
-        // Метод для активации состояния
+    // Метод для активации состояния
     void onEnter() override;
     // Метод для деактивации состояния
     void onExit() override;
