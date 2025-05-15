@@ -1,5 +1,5 @@
 #pragma once
-
+#include "../Game.hpp"
 #include <SFML/Graphics.hpp>
 
 /**
@@ -9,8 +9,12 @@
  * Наследуется от класса sf::Drawable для возможности 
  * отрисовки библиотекой SFML.
  */
-class Entity : public sf::Drawable {
+
+class Game;
+
+ class Entity : public sf::Drawable {
 protected:
+    Game* context;
     // Позиция объекта в пикселях
     sf::Vector2f position;
     // Спрайт объекта используется для отрисовки объекта на экране
