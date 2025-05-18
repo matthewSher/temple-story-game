@@ -9,7 +9,7 @@
 
 namespace fs = std::filesystem;
 
-GameProcessState::GameProcessState(Game* context) : GameState(context) {
+GameProcessState::GameProcessState() {
     infoLog("GameProcessState::GameProcessState", "Вызван конструктор");
 }
 
@@ -38,7 +38,7 @@ void GameProcessState::loadRooms() {
 
                     if (file.path().extension().string() == targetExt) {
                         infoLog("GameProcessState::loadRooms", "Загружается файл: " + file.path().string());
-                        rooms.push_back(std::make_unique<Room>(context->getTextureManager(), file.path().string()));
+                        rooms.push_back(std::make_unique<Room>(Game::getInstance().getTextureManager(), file.path().string()));
                         break;
                     }
                 }
@@ -62,7 +62,7 @@ void GameProcessState::handleInput(const sf::Event& event) {
     if (rooms.empty()) return;
     
     if (auto keyEvent = event.getIf<sf::Event::KeyPressed>()) {
-        if (auto* camera = context->getCamera()) {
+        if (auto* camera = Game::getInstance().getCamera()) {
             camera->handleInput(keyEvent);
         }
 
@@ -97,10 +97,12 @@ void GameProcessState::handleInput(const sf::Event& event) {
 }
 
 void GameProcessState::onEnter() {
+    Game& gameInstance = Game::getInstance();
+
     try {
         infoLog("GameProcessState::onEnter", "Начало инициализации");
         
-        player = std::make_unique<Player>(context->getTextureManager());
+        player = std::make_unique<Player>(gameInstance.getTextureManager());
         if (!player) {
             errorLog("GameProcessState::onEnter", "Не удалось создать игрока");
             throw std::runtime_error("Failed to create player");
@@ -121,7 +123,7 @@ void GameProcessState::onEnter() {
         infoLog("GameProcessState::onEnter", "Установлен начальный индекс комнаты: " + std::to_string(currentRoomIndex));
         
         // Устанавливаем начальную позицию камеры на игрока
-        if (auto* camera = context->getCamera()) {
+        if (auto* camera = gameInstance.getCamera()) {
             sf::Vector2f playerPos = player->getPosition();
             sf::Vector2f pixelPos = {playerPos.x * TILE_SIZE, playerPos.y * TILE_SIZE};
             camera->setCenter(pixelPos);

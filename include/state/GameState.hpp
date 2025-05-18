@@ -12,7 +12,7 @@ class Game;
  */
 class GameState {
 public:
-    GameState(Game* game) : context(game) {}
+    GameState() {}
     virtual ~GameState() = default;
      
     // Метод для обработки ввода от игрока
@@ -24,7 +24,5 @@ public:
     virtual void onEnter() = 0;
     // Метод для деактивации состояния
     virtual void onExit() = 0;
-    
-protected:
-    Game* context; // Не может быть null
+
 };

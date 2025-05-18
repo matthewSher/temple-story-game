@@ -16,7 +16,7 @@ class GameState;
  */
 class StateManager {
 public:
-    StateManager(Game* gameContext);
+    StateManager();
 
     // Существует ли текущее состояние
     bool isStateValid() const;
@@ -39,7 +39,4 @@ public:
 private:
     // Стек состояний
     std::stack<std::unique_ptr<GameState>> states;
-
-    // Контекст игры.
-    Game* context;
 };

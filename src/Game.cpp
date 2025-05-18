@@ -7,28 +7,49 @@
 #include "../include/constants/path.h"
 #include "../include/constants/main_constants.h"
 
-Game::Game() : stateManager(this) {
+Game::Game() {
     infoLog("Game::Game", "Вызван конструктор");
-
     window = sf::RenderWindow(sf::VideoMode({GameSettings::WINDOW_WIDTH, GameSettings::WINDOW_HEIGHT}), "Game");
     window.setFramerateLimit(GameSettings::FPS_LIMIT);
-
-    // Загрузка тайлсета в буфер с ресурсами
+    
+    // Загрузка ресурсов
     if (!textureManager.load("tileset", TILESET_PATH)) {
-        errorLog("Game::Game", "Ошибка загрузки тайлсета");
         throw std::runtime_error("Error loading tileset");
     }
-
-    // Загрузка шрифтов в буфер с ресурсами
     if (!fontManager.load("regular", REGULAR_FONT_PATH) || !fontManager.load("bold", BOLD_FONT_PATH)) {
-        errorLog("Game::Game", "Ошибка загрузки шрифта");
         throw std::runtime_error("Error loading font");
     }
     
     camera = std::make_unique<Camera>(window);
-    
-    // Начинаем с меню
-    pushState(std::make_unique<MenuState>(this));
+    // Не создаём MenuState здесь!
+}
+
+void Game::init() {
+    pushState(std::make_unique<MenuState>());
+}
+
+void Game::run() {
+    while (window.isOpen()) {
+        render();
+        handleEvents();
+        update();
+    }
+}
+
+ResourceManager<sf::Texture>& Game::getTextureManager() { 
+    return textureManager; 
+}
+
+ResourceManager<sf::Font>& Game::getFontManager() { 
+    return fontManager; 
+}
+
+Camera* Game::getCamera() { 
+    return camera.get(); 
+}
+
+sf::RenderWindow& Game::getWindow() { 
+    return window; 
 }
 
 void Game::handleEvents() {
@@ -68,10 +89,7 @@ void Game::changeState(std::unique_ptr<GameState> state) {
     stateManager.change(std::move(state));
 }
 
-void Game::run() {
-    while (window.isOpen()) {
-        render();
-        handleEvents();
-        update();
-    }
+Game& Game::getInstance() {
+    static Game instance; // Создаём единственный экземпляр класса
+    return instance;
 }

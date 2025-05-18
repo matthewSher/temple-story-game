@@ -10,9 +10,9 @@
 
 /**
  * Класс Game представляет собой основную игровую логику и управление игровым процессом.
- * Он отвечает за создание окна игры, загрузку ресурсов и управление состоянием игры.
+ * Он отвечает за создание окна игры, обработку всех игровых событий.
  * Он использует менеджеры ресурсов для загрузки текстур и шрифтов.
- * Он использует менеджер состояний для управления состояниями игры.
+ * Также использует менеджер состояний для управления состояниями игры.
  */
 class Game {
 private:
@@ -27,6 +27,8 @@ private:
     // Менеджер состояний служит для управления состояниями игры
     StateManager stateManager;
 
+    Game();
+
     // Метод для обработки событий
     void handleEvents();
     // Метод для обновления состояния игры
@@ -35,16 +37,19 @@ private:
     void render();
 
 public:
-    Game();
+    Game(const Game&) = delete;
+    Game& operator=(const Game&) = delete;
 
+    // Для единственной инициализации состояний
+    void init();
     // Метод для запуска игры
     void run();
     
     // Геттеры для доступа к ресурсам
-    ResourceManager<sf::Texture>& getTextureManager() { return textureManager; }
-    ResourceManager<sf::Font>& getFontManager() { return fontManager; }
-    Camera* getCamera() { return camera.get(); }
-    sf::RenderWindow& getWindow() { return window; }
+    ResourceManager<sf::Texture>& getTextureManager();
+    ResourceManager<sf::Font>& getFontManager();
+    Camera* getCamera();
+    sf::RenderWindow& getWindow();
     
     // Метод для закрытия окна
     void closeWindow() { window.close(); }
@@ -53,4 +58,7 @@ public:
     void pushState(std::unique_ptr<GameState> state);
     void popState();
     void changeState(std::unique_ptr<GameState> state);
+
+    // Получение единственного экземпляра класса
+    static Game& getInstance();
 };

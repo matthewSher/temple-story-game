@@ -24,8 +24,11 @@ private:
     // Хранит функции создания статических объектов
     std::unordered_map<std::string, Creator> creators;
 
-public:
     StaticObjectFactory();
+
+public:
+    StaticObjectFactory(const StaticObjectFactory&) = delete;
+    StaticObjectFactory& operator=(const StaticObjectFactory&) = delete;
     
     // Метод для обращения к единственному экземпляру класса
     static StaticObjectFactory& getInstance();

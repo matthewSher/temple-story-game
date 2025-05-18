@@ -1,12 +1,8 @@
 #include "../../include/state/StateManager.hpp"
 #include "../../include/utils/logging.h"
 
-StateManager::StateManager(Game* gameContext) : context(gameContext) {
+StateManager::StateManager() {
     infoLog("StateManager::StateManager", "Вызван конструктор");
-    if(!context) {
-        errorLog("StateManager::StateManager", "Контекст игры не может быть null");
-        throw std::invalid_argument("Game context cannot be null");
-    }
 }
 
 bool StateManager::isStateValid() const {

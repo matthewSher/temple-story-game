@@ -1,10 +1,11 @@
 #include "../../include/state/MenuState.hpp"
+
 #include "../../include/constants/game_settings.hpp"
 #include "../../include/Game.hpp"
 #include "../../include/ui/Button.hpp"
 #include <functional>
 
-MenuState::MenuState(Game* gameContext) : GameState(gameContext) {
+MenuState::MenuState() {
     infoLog("MenuState::MenuState", "Вызван конструктор");
 }
 
@@ -14,7 +15,7 @@ void MenuState::handleInput(const sf::Event& event) {
 
     for (auto& element : uiElements) {
         if (element && element->isElementActive()) {
-            element->handleEvent(event, context->getWindow());
+            element->handleEvent(event, Game::getInstance().getWindow());
         }
     }
 }
@@ -31,7 +32,9 @@ void MenuState::render(sf::RenderWindow& window) {
 void MenuState::onEnter() {
     infoLog("MenuState::onEnter", "Вызван метод onEnter");
 
-    auto& fontManager = context->getFontManager();
+    Game& gameInstance = Game::getInstance();
+
+    auto& fontManager = gameInstance.getFontManager();
 
     // Кнопка "Начать игру"
     auto startButton = std::make_unique<Button>(
@@ -39,14 +42,14 @@ void MenuState::onEnter() {
         sf::Vector2f(100, 25),      // Размер
         "Начать игру",              // Текст
         fontManager.get("regular"), // Шрифт
-        [this]() {                  // Callback
-            if (context && context->getWindow().isOpen()) {
-                auto newState = std::make_unique<GameProcessState>(context);
-                context->changeState(std::move(newState));
+        [&]() {                  // Callback
+            if (gameInstance.getWindow().isOpen()) {
+                auto newState = std::make_unique<GameProcessState>();
+                gameInstance.changeState(std::move(newState));
             }
         }
     );
-    startButton->setCameraView(&context->getWindow().getView());
+    startButton->setCameraView(&gameInstance.getWindow().getView());
     addUIElement(std::move(startButton));
 
     // Кнопка "Выйти из игры"
@@ -55,13 +58,11 @@ void MenuState::onEnter() {
         sf::Vector2f(110, 25),      // Размер
         "Выйти из игры",            // Текст
         fontManager.get("regular"), // Шрифт
-        [this]() {                  // Callback
-            if (context) {
-                context->closeWindow();
-            }
+        [&]() {                     // Callback
+            gameInstance.closeWindow();
         }
     );
-    exitButton->setCameraView(&context->getWindow().getView());
+    exitButton->setCameraView(&gameInstance.getWindow().getView());
     addUIElement(std::move(exitButton));
 }
 

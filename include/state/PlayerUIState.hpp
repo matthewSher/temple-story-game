@@ -1,21 +1,30 @@
+#pragma once
+
+#include <vector>
 #include "GameState.hpp"
 #include "../ui/UIElement.hpp"
 
-
-
 class PlayerUIState : public GameState {
 private:
+    // Вектор указателей на объекты UIElement, представляющие UI элементы в интерфейсе игрока
+    std::vector<std::unique_ptr<UIElement>> uiElements;
 
-    std::unique_ptr<UIElement> messageBox;
+public:
+    PlayerUIState();
 
-
+    // Метод для обработки ввода от игрока
     // keyEvent - событие нажатия клавиши, которое нужно обработать
-    virtual void handleInput(const sf::Event& event) = 0;
-    // Метод для отрисовки состояния игры на экране
-    virtual void render(sf::RenderWindow& window) = 0;
-    // Метод для активации состояния
-    virtual void onEnter() = 0;
-    // Метод для деактивации состояния
-    virtual void onExit() = 0;
+    void handleInput(const sf::Event& event) override;
 
+    // Метод для отрисовки состояния игры на экране
+    void render(sf::RenderWindow& window) override;
+
+    // Добавление UI элемента в вектор
+    void addUIElement(std::unique_ptr<UIElement> element);
+
+    // Метод для активации состояния
+    void onEnter() override;
+    
+    // Метод для деактивации состояния
+    void onExit() override;
 };

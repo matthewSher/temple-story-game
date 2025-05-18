@@ -23,7 +23,7 @@ private:
     void loadRooms();
 
 public:
-    GameProcessState(Game* context);
+    GameProcessState();
 
     // Метод для установки текущего индекса комнаты
     void setCurrentRoomIndex(int newIndex);
