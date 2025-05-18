@@ -12,11 +12,6 @@ bool StateManager::isStateValid() const {
 void StateManager::push(std::unique_ptr<GameState> state) {
     if(!state) return;
     
-    // Приостанавливаем текущее состояние
-    if(!states.empty()) {
-        states.top()->onExit();
-    }
-
     // Инициализируем и активируем новое состояние
     state->onEnter();
     states.push(std::move(state));

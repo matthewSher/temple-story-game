@@ -11,5 +11,7 @@ Letter::Letter(sf::Vector2f p, sf::Sprite s, const std::string& text) : StaticOb
 
 void Letter::interact() {
     descriptionWindow->show();
+
+    
 }
 

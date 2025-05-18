@@ -78,7 +78,7 @@ void Game::render() {
 }
 
 void Game::pushState(std::unique_ptr<GameState> state) {
-        stateManager.push(std::move(state));
+    stateManager.push(std::move(state));
 }
     
 void Game::popState() {

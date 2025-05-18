@@ -61,6 +61,10 @@ void GameProcessState::setCurrentRoomIndex(int newIndex) {
 void GameProcessState::handleInput(const sf::Event& event) {
     if (rooms.empty()) return;
     
+    PlayerUIState& playerUIState = PlayerUIState::getInstance();
+
+    playerUIState.handleInput(event);
+
     if (auto keyEvent = event.getIf<sf::Event::KeyPressed>()) {
         if (auto* camera = Game::getInstance().getCamera()) {
             camera->handleInput(keyEvent);
@@ -100,14 +104,11 @@ void GameProcessState::onEnter() {
     Game& gameInstance = Game::getInstance();
 
     try {
-        infoLog("GameProcessState::onEnter", "Начало инициализации");
-        
         player = std::make_unique<Player>(gameInstance.getTextureManager());
         if (!player) {
             errorLog("GameProcessState::onEnter", "Не удалось создать игрока");
             throw std::runtime_error("Failed to create player");
         }
-        infoLog("GameProcessState::onEnter", "Игрок успешно создан");
 
         loadRooms();
         
@@ -116,7 +117,6 @@ void GameProcessState::onEnter() {
             errorLog("GameProcessState::onEnter", "Не удалось загрузить комнаты");
             throw std::runtime_error("Failed to load rooms");
         }
-        infoLog("GameProcessState::onEnter", "Комнаты загружены");
 
         // Устанавливаем начальный индекс комнаты
         currentRoomIndex = 0;
@@ -130,6 +130,10 @@ void GameProcessState::onEnter() {
         } else {
             errorLog("GameProcessState::onEnter", "Камера не найдена");
         }
+
+        
+        PlayerUIState::getInstance().onEnter();
+
     } catch (const std::exception& e) {
         errorLog("GameProcessState::onEnter", "Ошибка при инициализации: " + std::string(e.what()));
         throw;
@@ -138,6 +142,8 @@ void GameProcessState::onEnter() {
 
 void GameProcessState::onExit() {
     infoLog("GameProcessState::onExit", "Вызван метод onExit");
+
+    PlayerUIState::getInstance().onExit();
 }
 
 void GameProcessState::render(sf::RenderWindow& window) {
@@ -154,4 +160,6 @@ void GameProcessState::render(sf::RenderWindow& window) {
 
     rooms[currentRoomIndex]->render(window);
     window.draw(*player);
+
+    PlayerUIState::getInstance().render(window);
 }

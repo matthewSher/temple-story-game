@@ -43,10 +43,8 @@ void MenuState::onEnter() {
         "Начать игру",              // Текст
         fontManager.get("regular"), // Шрифт
         [&]() {                  // Callback
-            if (gameInstance.getWindow().isOpen()) {
-                auto newState = std::make_unique<GameProcessState>();
-                gameInstance.changeState(std::move(newState));
-            }
+            auto newState = std::make_unique<GameProcessState>();
+            gameInstance.changeState(std::move(newState));
         }
     );
     startButton->setCameraView(&gameInstance.getWindow().getView());
